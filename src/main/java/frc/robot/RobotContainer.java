@@ -1,7 +1,7 @@
 
 package frc.robot;
 
-import frc.robot.autos.Auto1_FirstTrajectory;
+import frc.robot.autos.FullAuto;
 import frc.robot.subsystems.SwerveDrive;
 
 import edu.wpi.first.wpilibj.RobotState;
@@ -18,7 +18,7 @@ public class RobotContainer {
   private final SwerveDrive m_SwerveDrive = new SwerveDrive();
   private final AutonomousBuilder autonomousBuilder = new AutonomousBuilder(m_SwerveDrive);
   SendableChooser<Command> m_chooser_auto = new SendableChooser<>();
-  private final Auto1_FirstTrajectory auto1 = new Auto1_FirstTrajectory();
+  private final FullAuto auto1 = new FullAuto();
 
   public RobotContainer() {
     m_chooser_auto.setDefaultOption("NoAutoSelected", null);
