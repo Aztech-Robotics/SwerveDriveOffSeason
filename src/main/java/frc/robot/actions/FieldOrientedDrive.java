@@ -35,7 +35,6 @@ public class FieldOrientedDrive extends CommandBase {
     SwerveModulePosition[] zeroPositions = new SwerveModulePosition[4];
     for (SwerveModulePosition modulePosition : zeroPositions){
       modulePosition = new SwerveModulePosition();
-      modulePosition.compareTo(modulePosition);
     }
     m_SwerveDrive.setModulesPosition(zeroPositions);
   }

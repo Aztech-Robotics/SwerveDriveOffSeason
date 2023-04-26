@@ -16,8 +16,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.SwerveMode;
 
 public class SwerveDrive extends SubsystemBase {
-  private SwerveMode swerveMode;
-  private SwerveModule[] modules;
   public static SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(
     //FrontLeft
     new Translation2d(-Constants.trackWidth/2, Constants.wheelBase/2),
@@ -28,19 +26,24 @@ public class SwerveDrive extends SubsystemBase {
     //RearRight 
     new Translation2d(Constants.trackWidth/2, -Constants.wheelBase/2)
   );
-  private ChassisSpeeds desiredChassisSpeeds = null;
+  private SwerveModule[] modules = new SwerveModule[4];
   private double modulesVoltage [][] = new double[4][2];
-  private SwerveDriveOdometry swerveDriveOdometry;
+  private ChassisSpeeds desiredChassisSpeeds = null;
 
+  private SwerveMode swerveMode = null;
+  private SwerveDriveOdometry swerveDriveOdometry = null;
   private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
   public SwerveDrive() {
     modules[0] = new SwerveModule(Constants.id_drive_fLeft, Constants.id_steer_fLeft, Constants.id_canCoder_fLeft, Constants.offset_fLeft);
-    modules[1] = new SwerveModule(Constants.id_drive_fRight, Constants.id_steer_fRight, Constants.id_canCoder_fRight, Constants.offset_fRight);
-    modules[2] = new SwerveModule(Constants.id_drive_bLeft, Constants.id_steer_bLeft, Constants.id_canCoder_bLeft, Constants.offset_bLeft);
-    modules[3] = new SwerveModule(Constants.id_drive_bRight, Constants.id_steer_bRight, Constants.id_canCoder_bRight, Constants.offset_bRight);
+    modules[1] = null;
+    modules[2] = null;
+    modules[3] = null;
+    //modules[1] = new SwerveModule(Constants.id_drive_fRight, Constants.id_steer_fRight, Constants.id_canCoder_fRight, Constants.offset_fRight);
+    //modules[2] = new SwerveModule(Constants.id_drive_bLeft, Constants.id_steer_bLeft, Constants.id_canCoder_bLeft, Constants.offset_bLeft);
+    //modules[3] = new SwerveModule(Constants.id_drive_bRight, Constants.id_steer_bRight, Constants.id_canCoder_bRight, Constants.offset_bRight);
 
-    swerveDriveOdometry = new SwerveDriveOdometry(swerveDriveKinematics, getGyroAngle(), getModulesPosition());
+    //resetChassisPosition();
   }
 
   @Override
@@ -66,6 +69,8 @@ public class SwerveDrive extends SubsystemBase {
       //Update Odometry
       case Trajectory:
         updateOdometry();
+      break;
+      default:
       break;
     }
   }
@@ -129,6 +134,15 @@ public class SwerveDrive extends SubsystemBase {
   public void setModulesVoltage (double[][] array){
     modulesVoltage = array;
   }
+
+  public void resetChassisPosition (){
+    for (SwerveModule module : modules){
+      module.setAngleCanCoderToPositionMotor();
+      module.setModulePosition(new SwerveModulePosition());
+    }
+    resetGyroAngle();
+    swerveDriveOdometry = new SwerveDriveOdometry(swerveDriveKinematics, getGyroAngle(), getModulesPosition());
+  }
   
   public void resetGyroAngle (){
     gyro.reset();
@@ -150,5 +164,14 @@ public class SwerveDrive extends SubsystemBase {
   
   @Override
   public void simulationPeriodic() {
+  }
+
+  public void setOnlyOneModule (int nMod, double output_speed, double output_steer){
+    modules[nMod].voltageSpeedMotor(output_speed);
+    modules[nMod].voltageSteerMotor(output_steer);
+  }
+
+  public void setAngleOnlyOneModule (int nMod,Rotation2d angle){
+    modules[nMod].angleSteerMotor(angle);
   }
 }

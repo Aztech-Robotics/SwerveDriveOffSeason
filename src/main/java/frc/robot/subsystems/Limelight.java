@@ -6,7 +6,7 @@ import frc.robot.GeneralMode;
 import frc.robot.Constants.TypePipeline;
 
 public class Limelight extends SubsystemBase {
-  //private TypePipeline activePipeline;
+  private TypePipeline activePipeline;
 
   public Limelight() {
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
@@ -26,7 +26,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public void setPipeline(TypePipeline pipeline){
-    //activePipeline = pipeline;
+    activePipeline = pipeline;
     switch (pipeline){
       case RetroflectiveTape:
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
