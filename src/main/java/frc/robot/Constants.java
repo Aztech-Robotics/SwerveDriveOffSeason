@@ -26,7 +26,7 @@ public final class Constants {
   public static final int id_drive_fLeft = 1;
   public static final int id_steer_fLeft = 2;
   public static final int id_canCoder_fLeft = 3;
-  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(0);
+  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(100);
 
   public static final int id_drive_fRight = 4;
   public static final int id_steer_fRight = 5;
@@ -43,9 +43,9 @@ public final class Constants {
   public static final int id_canCoder_bRight = 12;
   public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(0);
 
-  public static final double kp_steerController = 0.1;
-  public static final double ki_steerController = 0.0001;
-  public static final double kd_steerController = 1;
+  public static final double kp_steerController = 0.25;
+  public static final double ki_steerController = 0.002;
+  public static final double kd_steerController = 2.15;
   public static final double kf_steerController = 0.0;
   public static final double kIz_steerController = 0.0;
 
@@ -56,6 +56,7 @@ public final class Constants {
   public static final double kIz_speedController = 0.0;
 
   public static enum SwerveMode {
+    Nothing,
     OpenLoopWithVoltage,
     OpenLoopWithVelocity,
     Trajectory

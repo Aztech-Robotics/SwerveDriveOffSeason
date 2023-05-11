@@ -34,7 +34,7 @@ public class SwerveModule {
         speedMotor = new CANSparkMax(id_speedMotor, MotorType.kBrushless);
         encoder_speedMotor = speedMotor.getEncoder();
         encoder_speedMotor.setPositionConversionFactor(Constants.drivePositionCoefficient);
-        encoder_speedMotor.setVelocityConversionFactor(Constants.driveVelocityCoefficient);
+        //encoder_speedMotor.setVelocityConversionFactor(Constants.driveVelocityCoefficient);
         controller_speedMotor = speedMotor.getPIDController();
         controller_speedMotor.setFeedbackDevice(encoder_speedMotor);
         controller_speedMotor.setP(Constants.kp_speedController, 0);
@@ -54,16 +54,19 @@ public class SwerveModule {
         controller_steerMotor.setD(Constants.kd_steerController, 0);
         controller_steerMotor.setFF(Constants.kf_steerController, 0);
         controller_steerMotor.setIZone(Constants.kIz_steerController, 0);
-        //controller_steerMotor.setPositionPIDWrappingEnabled(true);
-        //controller_steerMotor.setPositionPIDWrappingMinInput(0);
-        //controller_steerMotor.setPositionPIDWrappingMaxInput(Math.PI * 2);
+        controller_steerMotor.setPositionPIDWrappingEnabled(true);
+        controller_steerMotor.setPositionPIDWrappingMinInput(0);
+        controller_steerMotor.setPositionPIDWrappingMaxInput(Math.PI * 2);
+        controller_steerMotor.setSmartMotionAllowedClosedLoopError(1, 0); 
 
         cancoder_steerMotor = new CANCoder(id_steerCanCoder);
         cancoder_steerMotor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
         cancoder_steerMotor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-        cancoder_steerMotor.configMagnetOffset(steerOffset.getDegrees());
+        cancoder_steerMotor.configMagnetOffset(360 - steerOffset.getDegrees());
 
         outputTelemetry(); 
+        setAngleCanCoderToPositionMotor();
+        encoder_speedMotor.setPosition(0);
     }
     
     public void voltageSpeedMotor (double output){
@@ -71,11 +74,11 @@ public class SwerveModule {
     }
     
     public void velocitySpeedMotor (double velocity){
-        controller_speedMotor.setReference(velocity, CANSparkMax.ControlType.kVelocity); 
+        controller_speedMotor.setReference(velocity/Constants.driveVelocityCoefficient, CANSparkMax.ControlType.kVelocity); 
     }
     
     public double getVelocitySpeedMotor (){
-        return encoder_speedMotor.getVelocity();
+        return (encoder_speedMotor.getVelocity()*Constants.driveVelocityCoefficient);
     }
     
     public void setPositionSpeedMotor (double position){
@@ -114,7 +117,7 @@ public class SwerveModule {
     }
     
     public void angleSteerMotor (Rotation2d angle){
-        Rotation2d errorAngle = constraintAngle(angle).minus(constraintAngle(getSteerMotorAngle()));
+        Rotation2d errorAngle = angle.minus(constraintAngle(getSteerMotorAngle()));
         controller_steerMotor.setReference(encoder_steerMotor.getPosition() + errorAngle.getRadians(), CANSparkMax.ControlType.kPosition);
     }
     
@@ -153,9 +156,9 @@ public class SwerveModule {
     }
 
     public void outputTelemetry (){
-        tabDrivePositions.addDouble("SpeedMotor Velocity" + speedMotor.getDeviceId(), () -> {return getVelocitySpeedMotor();});
-        tabDrivePositions.addDouble("SpeedMotor Position" + speedMotor.getDeviceId(), () -> {return getPositionSpeedMotor();});
-        tabDrivePositions.addDouble("CanCoder Angle (Degrees)" + steerMotor.getDeviceId(), () -> {return getCanCoderAngle().getDegrees();});
-        tabDrivePositions.addDouble("SteerMotor Angle (Degrees)" + steerMotor.getDeviceId(), () -> {return getSteerMotorAngle().getDegrees();});
+        tabDrivePositions.addDouble("SpeedMotorPosition" + speedMotor.getDeviceId(), () -> {return getPositionSpeedMotor();});
+        tabDrivePositions.addDouble("SpeedMotorVelocity" + speedMotor.getDeviceId(), () -> {return getVelocitySpeedMotor();});
+        tabDrivePositions.addDouble("CanCoderAngle" + steerMotor.getDeviceId(), () -> {return getCanCoderAngle().getDegrees();});
+        tabDrivePositions.addDouble("SteerMotorAngle" + steerMotor.getDeviceId(), () -> {return getSteerMotorAngle().getDegrees();});
     }
 }

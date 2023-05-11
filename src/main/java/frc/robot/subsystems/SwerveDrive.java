@@ -30,7 +30,7 @@ public class SwerveDrive extends SubsystemBase {
   private double modulesVoltage [][] = new double[4][2];
   private ChassisSpeeds desiredChassisSpeeds = null;
 
-  private SwerveMode swerveMode = null;
+  private SwerveMode swerveMode = SwerveMode.Nothing;
   private SwerveDriveOdometry swerveDriveOdometry = null;
   private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
@@ -49,6 +49,8 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void periodic() {
     switch (swerveMode){
+      case Nothing:
+      break; 
       //Update outputs in Meters Per Second
       case OpenLoopWithVelocity:
         SwerveModuleState[] moduleStatesArray;
@@ -69,8 +71,6 @@ public class SwerveDrive extends SubsystemBase {
       //Update Odometry
       case Trajectory:
         updateOdometry();
-      break;
-      default:
       break;
     }
   }
@@ -167,11 +167,11 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setOnlyOneModule (int nMod, double output_speed, double output_steer){
-    modules[nMod].voltageSpeedMotor(output_speed);
+    modules[nMod].velocitySpeedMotor(output_speed);
     modules[nMod].voltageSteerMotor(output_steer);
   }
 
   public void setAngleOnlyOneModule (int nMod,Rotation2d angle){
-    modules[nMod].angleSteerMotor(angle);
+    modules[nMod].setModuleState(SwerveModuleState.optimize(new SwerveModuleState(0, angle), modules[nMod].getCanCoderAngle()));
   }
 }
