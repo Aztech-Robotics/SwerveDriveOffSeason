@@ -3,6 +3,9 @@ package frc.robot.actions;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 
@@ -19,11 +22,12 @@ public class CalibrateModule extends CommandBase {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   @Override
   public void execute() {
-    swerveDrive.setOnlyOneModule(module, stickSpeed.getAsDouble(), MathUtil.applyDeadband(stickSteer.getAsDouble(), 0.1));
+    swerveDrive.setOnlyOneModule(module, MathUtil.applyDeadband(stickSpeed.getAsDouble(), 0.2), MathUtil.applyDeadband(stickSteer.getAsDouble(), 0.2));
   }
 
   @Override

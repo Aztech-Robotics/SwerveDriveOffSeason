@@ -32,19 +32,21 @@ public class FieldOrientedDrive extends CommandBase {
   public void initialize() {
     m_SwerveDrive.setMode(SwerveMode.OpenLoopWithVelocity);
     m_SwerveDrive.restartPositionSteerMotor();
+    /*
     SwerveModulePosition[] zeroPositions = new SwerveModulePosition[4];
     for (SwerveModulePosition modulePosition : zeroPositions){
       modulePosition = new SwerveModulePosition();
     }
     m_SwerveDrive.setModulesPosition(zeroPositions);
+    */
   }
 
   @Override
   public void execute() {
     m_SwerveDrive.setDesiredChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(
-      translateXRateLimiter.calculate(MathUtil.applyDeadband(translationXSupplier.getAsDouble() * Constants.maxDriveVel, 0.1)),
-      translateYRateLimiter.calculate(MathUtil.applyDeadband(translationYSupplier.getAsDouble() * Constants.maxDriveVel, 0.1)),
-      rotationRateLimiter.calculate(MathUtil.applyDeadband(rotationSupplier.getAsDouble() * Constants.maxAngVel, 0.1)),
+      translateXRateLimiter.calculate(MathUtil.applyDeadband(translationXSupplier.getAsDouble() * Constants.maxDriveVel, 0.2)),
+      translateYRateLimiter.calculate(MathUtil.applyDeadband(translationYSupplier.getAsDouble() * Constants.maxDriveVel, 0.2)),
+      rotationRateLimiter.calculate(MathUtil.applyDeadband(rotationSupplier.getAsDouble() * Constants.maxAngVel, 0.2)),
       m_SwerveDrive.getGyroAngle()
     ));
   }

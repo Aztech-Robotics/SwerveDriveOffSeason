@@ -3,6 +3,7 @@ package frc.robot;
 
 import frc.robot.actions.CalibrateModule;
 import frc.robot.actions.CalibrateModuleAngle;
+import frc.robot.actions.FieldOrientedDrive;
 import frc.robot.autos.FullAuto;
 import frc.robot.subsystems.SwerveDrive;
 import edu.wpi.first.math.MathUtil;
@@ -28,11 +29,11 @@ public class RobotContainer {
     //m_chooser_auto.setDefaultOption("NoAutoSelected", null);
     //m_chooser_auto.addOption("2Scores + 1Piece + ChargeStation", autonomousBuilder.createCommand(auto1));
     //SmartDashboard.putData("Auto", m_chooser_auto);
+    m_SwerveDrive.setDefaultCommand(new FieldOrientedDrive(m_SwerveDrive, () -> {return -Control0.getLeftY();}, () -> {return Control0.getLeftX();}, () -> {return Control0.getRightX();}));
     configureBindings();
   }
 
   private void configureBindings() {
-    /*
     Trigger changeIdleMode = new Trigger(RobotState::isEnabled);
     changeIdleMode.toggleOnTrue(
       new InstantCommand(
@@ -43,6 +44,7 @@ public class RobotContainer {
         () -> {m_SwerveDrive.setCoastMode();}
       )
     );
+    /*
     Trigger modeChanged = new Trigger(GeneralMode.getInstance()::haveChanged);
     modeChanged.toggleOnTrue(
       new ParallelCommandGroup(
@@ -51,11 +53,12 @@ public class RobotContainer {
       )
     );
     Control0.a().onTrue(GeneralMode.getInstance().toggleMode());
-    */
-    Control0.a().whileTrue(new CalibrateModule(m_SwerveDrive, 0, ()->{return -(Control1.getLeftY() * Constants.maxDriveVel);}, ()->{return Control1.getRightX();}));
-    Control1.a().toggleOnTrue(new CalibrateModuleAngle(m_SwerveDrive, 0, Rotation2d.fromDegrees(80)));
+    Control0.a().whileTrue(new CalibrateModule(m_SwerveDrive, 0 , ()->{return -(Control1.getLeftY() * Constants.maxDriveVel);}, ()->{return Control1.getRightX();}));
+    Control1.a().toggleOnTrue(new CalibrateModuleAngle(m_SwerveDrive, 0, Rotation2d.fromDegrees(0)));
     Control1.b().toggleOnTrue(new CalibrateModuleAngle(m_SwerveDrive, 0, Rotation2d.fromDegrees(135)));
     Control1.x().toggleOnTrue(new CalibrateModuleAngle(m_SwerveDrive, 0, Rotation2d.fromDegrees(90)));
+    */
+
   }
 
   public Command getAutonomousCommand() {
