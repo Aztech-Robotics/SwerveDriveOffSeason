@@ -10,7 +10,7 @@ public final class Constants {
   public static final double wheelBase = Units.inchesToMeters(20);
   public static final double wheelDiameter = 0.1;
   public static final double max_rpm_spark = 5676;
-  public static final double drive_gear_ratio = 5.14;
+  public static final double drive_gear_ratio = 6.75;
   public static final double steer_gear_ratio = 12.8;
   
   //MetersPerSecond
@@ -26,22 +26,22 @@ public final class Constants {
   public static final int id_drive_fLeft = 1;
   public static final int id_steer_fLeft = 2;
   public static final int id_canCoder_fLeft = 3;
-  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(95);
+  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(100);
 
   public static final int id_drive_fRight = 4;
   public static final int id_steer_fRight = 5;
   public static final int id_canCoder_fRight = 6;
-  public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(5);
+  public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(0);
 
   public static final int id_drive_bLeft = 7;
   public static final int id_steer_bLeft = 8;
   public static final int id_canCoder_bLeft = 9;
-  public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(55);
+  public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(132);
 
   public static final int id_drive_bRight = 10;
   public static final int id_steer_bRight = 11;
   public static final int id_canCoder_bRight = 12;
-  public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(105);
+  public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(35); 
 
   public static final double kp_steerController = 0.8;
   public static final double ki_steerController = 0.0;
@@ -49,7 +49,7 @@ public final class Constants {
   public static final double kf_steerController = 0.0;
   public static final double kIz_steerController = 0.0;
 
-  public static final double kp_speedController = 0.0003;
+  public static final double kp_speedController = 0.0004;
   public static final double ki_speedController = 0.0;
   public static final double kd_speedController = 0.0;
   public static final double kf_speedController = 0.0;

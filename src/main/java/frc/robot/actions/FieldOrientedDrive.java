@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -31,24 +32,17 @@ public class FieldOrientedDrive extends CommandBase {
   @Override
   public void initialize() {
     m_SwerveDrive.setMode(SwerveMode.OpenLoopWithVelocity);
-    m_SwerveDrive.restartPositionSteerMotor();
-    /*
-    SwerveModulePosition[] zeroPositions = new SwerveModulePosition[4];
-    for (SwerveModulePosition modulePosition : zeroPositions){
-      modulePosition = new SwerveModulePosition();
-    }
-    m_SwerveDrive.setModulesPosition(zeroPositions);
-    */
   }
 
   @Override
   public void execute() {
-    m_SwerveDrive.setDesiredChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(
-      translateXRateLimiter.calculate(MathUtil.applyDeadband(translationXSupplier.getAsDouble() * Constants.maxDriveVel, 0.2)),
-      translateYRateLimiter.calculate(MathUtil.applyDeadband(translationYSupplier.getAsDouble() * Constants.maxDriveVel, 0.2)),
-      rotationRateLimiter.calculate(MathUtil.applyDeadband(rotationSupplier.getAsDouble() * Constants.maxAngVel, 0.2)),
-      m_SwerveDrive.getGyroAngle()
-    ));
+    m_SwerveDrive.setDesiredChassisSpeeds(
+      new ChassisSpeeds(
+        translateXRateLimiter.calculate(MathUtil.applyDeadband(translationXSupplier.getAsDouble(), 0.2) * Constants.maxDriveVel),
+        translateYRateLimiter.calculate(MathUtil.applyDeadband(translationYSupplier.getAsDouble(), 0.2) * Constants.maxDriveVel),
+        rotationRateLimiter.calculate(MathUtil.applyDeadband(rotationSupplier.getAsDouble(), 0.2) * Constants.maxAngVel)
+      )
+    );
   }
 
   @Override

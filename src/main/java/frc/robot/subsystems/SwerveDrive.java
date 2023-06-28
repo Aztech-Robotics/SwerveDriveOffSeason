@@ -11,6 +11,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveMode;
@@ -33,13 +37,15 @@ public class SwerveDrive extends SubsystemBase {
   private SwerveMode swerveMode = SwerveMode.Nothing;
   private SwerveDriveOdometry swerveDriveOdometry = null;
   private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+  private ShuffleboardTab tabSwerveStates = Shuffleboard.getTab("SwerveStates");
 
   public SwerveDrive() {
     modules[0] = new SwerveModule(Constants.id_drive_fLeft, Constants.id_steer_fLeft, Constants.id_canCoder_fLeft, Constants.offset_fLeft);
     modules[1] = new SwerveModule(Constants.id_drive_fRight, Constants.id_steer_fRight, Constants.id_canCoder_fRight, Constants.offset_fRight);
     modules[2] = new SwerveModule(Constants.id_drive_bLeft, Constants.id_steer_bLeft, Constants.id_canCoder_bLeft, Constants.offset_bLeft);
     modules[3] = new SwerveModule(Constants.id_drive_bRight, Constants.id_steer_bRight, Constants.id_canCoder_bRight, Constants.offset_bRight);
-
+    restartPositionSteerMotor();
+    setCoastMode();
     //resetChassisPosition();
   }
 
@@ -52,7 +58,7 @@ public class SwerveDrive extends SubsystemBase {
       case OpenLoopWithVelocity:
         SwerveModuleState[] moduleStatesArray;
         if (desiredChassisSpeeds != null) {
-          moduleStatesArray = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds); 
+          moduleStatesArray = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
           SwerveDriveKinematics.desaturateWheelSpeeds(moduleStatesArray, Constants.maxDriveVel);
           setModulesStates(moduleStatesArray);
         }
@@ -135,7 +141,7 @@ public class SwerveDrive extends SubsystemBase {
   public void resetChassisPosition (){
     for (SwerveModule module : modules){
       module.setAngleCanCoderToPositionMotor();
-      module.setModulePosition(new SwerveModulePosition());
+      module.setModulePosition(new SwerveModulePosition(0, Rotation2d.fromDegrees(0)));
     }
     resetGyroAngle();
     swerveDriveOdometry = new SwerveDriveOdometry(swerveDriveKinematics, getGyroAngle(), getModulesPosition());

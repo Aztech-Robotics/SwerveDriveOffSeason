@@ -9,6 +9,8 @@ import frc.robot.subsystems.SwerveDrive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +23,12 @@ public class RobotContainer {
   private CommandXboxController Control0 = new CommandXboxController(0);
   private CommandXboxController Control1 = new CommandXboxController(1);
   private final SwerveDrive m_SwerveDrive = new SwerveDrive();
+  private final FieldOrientedDrive m_FieldOrientedDrive = new FieldOrientedDrive(
+    m_SwerveDrive, 
+    () -> {return -Control0.getLeftY();}, 
+    () -> {return Control0.getLeftX();}, 
+    () -> {return Control0.getRightX();}
+  );
   //private final AutonomousBuilder autonomousBuilder = new AutonomousBuilder(m_SwerveDrive);
   //SendableChooser<Command> m_chooser_auto = new SendableChooser<>();
   //private final FullAuto auto1 = new FullAuto();
@@ -29,17 +37,20 @@ public class RobotContainer {
     //m_chooser_auto.setDefaultOption("NoAutoSelected", null);
     //m_chooser_auto.addOption("2Scores + 1Piece + ChargeStation", autonomousBuilder.createCommand(auto1));
     //SmartDashboard.putData("Auto", m_chooser_auto);
-    m_SwerveDrive.setDefaultCommand(new FieldOrientedDrive(m_SwerveDrive, () -> {return -Control0.getLeftY();}, () -> {return Control0.getLeftX();}, () -> {return Control0.getRightX();}));
+    ShuffleboardTab tabRobot = Shuffleboard.getTab("RobotData");
+    tabRobot.addBoolean("Robot Enabled", RobotState::isEnabled);
+    m_SwerveDrive.setDefaultCommand(m_FieldOrientedDrive);
     configureBindings();
   }
 
   private void configureBindings() {
-    Trigger changeIdleMode = new Trigger(RobotState::isEnabled);
-    changeIdleMode.toggleOnTrue(
+    Trigger idleMode = new Trigger(RobotState::isEnabled);
+    idleMode.onTrue(
       new InstantCommand(
         () -> {m_SwerveDrive.setBrakeMode();}
       )
-    ).toggleOnFalse(
+    );
+    idleMode.onFalse(
       new InstantCommand(
         () -> {m_SwerveDrive.setCoastMode();}
       )
@@ -52,11 +63,6 @@ public class RobotContainer {
         //m_SwerveDrive.getCurrentCommand()
       )
     );
-    Control0.a().onTrue(GeneralMode.getInstance().toggleMode());
-    Control0.a().whileTrue(new CalibrateModule(m_SwerveDrive, 0 , ()->{return -(Control1.getLeftY() * Constants.maxDriveVel);}, ()->{return Control1.getRightX();}));
-    Control1.a().toggleOnTrue(new CalibrateModuleAngle(m_SwerveDrive, 0, Rotation2d.fromDegrees(0)));
-    Control1.b().toggleOnTrue(new CalibrateModuleAngle(m_SwerveDrive, 0, Rotation2d.fromDegrees(135)));
-    Control1.x().toggleOnTrue(new CalibrateModuleAngle(m_SwerveDrive, 0, Rotation2d.fromDegrees(90)));
     */
 
   }

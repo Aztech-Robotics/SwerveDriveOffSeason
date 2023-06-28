@@ -14,8 +14,13 @@ import com.revrobotics.SparkMaxAlternateEncoder.Type;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import frc.robot.Constants;
 
 public class SwerveModule {
@@ -156,9 +161,10 @@ public class SwerveModule {
     }
 
     public void outputTelemetry (){
-        tabDrivePositions.addDouble("SpeedMotorPosition" + speedMotor.getDeviceId(), () -> {return getPositionSpeedMotor();});
-        tabDrivePositions.addDouble("SpeedMotorVelocity" + speedMotor.getDeviceId(), () -> {return getVelocitySpeedMotor();});
-        tabDrivePositions.addDouble("CanCoderAngle" + steerMotor.getDeviceId(), () -> {return getCanCoderAngle().getDegrees();});
-        tabDrivePositions.addDouble("SteerMotorAngle" + steerMotor.getDeviceId(), () -> {return getSteerMotorAngle().getDegrees();});
+        ShuffleboardLayout motorsData = tabDrivePositions.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList);
+        motorsData.addDouble("SpeedMotorPosition", () -> {return getPositionSpeedMotor();});
+        motorsData.addDouble("SpeedMotorVelocity", () -> {return getVelocitySpeedMotor();});
+        motorsData.addDouble("CanCoderAngle", () -> {return getCanCoderAngle().getDegrees();});
+        motorsData.addDouble("SteerMotorAngle", () -> {return getSteerMotorAngle().getDegrees();});
     }
 }
