@@ -1,21 +1,11 @@
 
 package frc.robot;
 
-import frc.robot.actions.CalibrateModule;
-import frc.robot.actions.CalibrateModuleAngle;
 import frc.robot.actions.FieldOrientedDrive;
-import frc.robot.autos.FullAuto;
 import frc.robot.subsystems.SwerveDrive;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -29,16 +19,8 @@ public class RobotContainer {
     () -> {return Control0.getLeftX();}, 
     () -> {return Control0.getRightX();}
   );
-  //private final AutonomousBuilder autonomousBuilder = new AutonomousBuilder(m_SwerveDrive);
-  //SendableChooser<Command> m_chooser_auto = new SendableChooser<>();
-  //private final FullAuto auto1 = new FullAuto();
 
   public RobotContainer() {
-    //m_chooser_auto.setDefaultOption("NoAutoSelected", null);
-    //m_chooser_auto.addOption("2Scores + 1Piece + ChargeStation", autonomousBuilder.createCommand(auto1));
-    //SmartDashboard.putData("Auto", m_chooser_auto);
-    ShuffleboardTab tabRobot = Shuffleboard.getTab("RobotData");
-    tabRobot.addBoolean("Robot Enabled", RobotState::isEnabled);
     m_SwerveDrive.setDefaultCommand(m_FieldOrientedDrive);
     configureBindings();
   }
@@ -69,6 +51,5 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return null; 
-    //return m_chooser_auto.getSelected();
   }
 }
