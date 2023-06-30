@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -31,22 +32,20 @@ public class SwerveDrive extends SubsystemBase {
     new Translation2d(Constants.trackWidth/2, -Constants.wheelBase/2)
   );
   private SwerveModule[] modules = new SwerveModule[4];
-  private double modulesVoltage [][] = new double[4][2];
   private ChassisSpeeds desiredChassisSpeeds = null;
 
   private SwerveMode swerveMode = SwerveMode.Nothing;
   private SwerveDriveOdometry swerveDriveOdometry = null;
   private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
-  private ShuffleboardTab tabSwerveStates = Shuffleboard.getTab("SwerveStates");
+  private ShuffleboardTab tabDrive = Shuffleboard.getTab("DriveData"); 
 
   public SwerveDrive() {
     modules[0] = new SwerveModule(Constants.id_drive_fLeft, Constants.id_steer_fLeft, Constants.id_canCoder_fLeft, Constants.offset_fLeft);
     modules[1] = new SwerveModule(Constants.id_drive_fRight, Constants.id_steer_fRight, Constants.id_canCoder_fRight, Constants.offset_fRight);
     modules[2] = new SwerveModule(Constants.id_drive_bLeft, Constants.id_steer_bLeft, Constants.id_canCoder_bLeft, Constants.offset_bLeft);
     modules[3] = new SwerveModule(Constants.id_drive_bRight, Constants.id_steer_bRight, Constants.id_canCoder_bRight, Constants.offset_bRight);
-    restartPositionSteerMotor();
     setCoastMode();
-    //resetChassisPosition();
+    resetChassisPosition(); 
   }
 
   @Override
@@ -66,10 +65,6 @@ public class SwerveDrive extends SubsystemBase {
       break;
       //Update outputs in Percent
       case OpenLoopWithVoltage:
-        for (int i=0; i < modules.length; i++){
-          modules[i].voltageSpeedMotor(modulesVoltage[i][0]);
-          modules[i].voltageSteerMotor(modulesVoltage[i][1]);
-        }
       break;
       //Update Odometry
       case Trajectory:
@@ -104,7 +99,7 @@ public class SwerveDrive extends SubsystemBase {
   
   public void setModulesStates (SwerveModuleState[] swerveModulesModuleStates){
     for (int i=0; i < modules.length; i++){
-      modules[i].setModuleState(swerveModulesModuleStates[i]);
+      modules[i].setModuleState(SwerveModuleState.optimize(swerveModulesModuleStates[i], modules[i].getCanCoderAngle()));
     }
   }
   
@@ -133,10 +128,6 @@ public class SwerveDrive extends SubsystemBase {
   public void setDesiredChassisSpeeds (ChassisSpeeds chassisSpeeds){
     desiredChassisSpeeds = chassisSpeeds;
   }
-  
-  public void setModulesVoltage (double[][] array){
-    modulesVoltage = array;
-  }
 
   public void resetChassisPosition (){
     for (SwerveModule module : modules){
@@ -164,17 +155,12 @@ public class SwerveDrive extends SubsystemBase {
       swerveModule.setAngleCanCoderToPositionMotor();
     }
   }
+
+  public void outputTelemetry (){
+    tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}).withWidget(BuiltInWidgets.kGyro); 
+  }
   
   @Override
   public void simulationPeriodic() {
-  }
-
-  public void setOnlyOneModule (int nMod, double output_speed, double output_steer){
-    modules[nMod].velocitySpeedMotor(output_speed);
-    modules[nMod].voltageSteerMotor(output_steer);
-  }
-
-  public void setAngleOnlyOneModule (int nMod,Rotation2d angle){
-    modules[nMod].setModuleState(SwerveModuleState.optimize(new SwerveModuleState(0, angle), modules[nMod].getCanCoderAngle()));
   }
 }

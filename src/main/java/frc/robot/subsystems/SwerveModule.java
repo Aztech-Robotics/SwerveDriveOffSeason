@@ -3,24 +3,19 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAlternateEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.LayoutType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import frc.robot.Constants;
 
 public class SwerveModule {
@@ -31,15 +26,12 @@ public class SwerveModule {
     private RelativeEncoder encoder_steerMotor;
     private SparkMaxPIDController controller_steerMotor;
     private CANCoder cancoder_steerMotor;
-    private Rotation2d steerOffset;
     private ShuffleboardTab tabDrivePositions = Shuffleboard.getTab("MotorsData");
 
     public SwerveModule (int id_speedMotor, int id_steerMotor, int id_steerCanCoder, Rotation2d steerOffset){
-        this.steerOffset = steerOffset;
         speedMotor = new CANSparkMax(id_speedMotor, MotorType.kBrushless);
         encoder_speedMotor = speedMotor.getEncoder();
         encoder_speedMotor.setPositionConversionFactor(Constants.drivePositionCoefficient);
-        //encoder_speedMotor.setVelocityConversionFactor(Constants.driveVelocityCoefficient);
         controller_speedMotor = speedMotor.getPIDController();
         controller_speedMotor.setFeedbackDevice(encoder_speedMotor);
         controller_speedMotor.setP(Constants.kp_speedController, 0);
@@ -49,6 +41,7 @@ public class SwerveModule {
         controller_speedMotor.setIZone(Constants.kIz_speedController, 0);
 
         steerMotor = new CANSparkMax(id_steerMotor, MotorType.kBrushless);
+        steerMotor.setSmartCurrentLimit(0, 50, 0);
         encoder_steerMotor = steerMotor.getEncoder();
         encoder_steerMotor.setPositionConversionFactor(Constants.steerPositionCoefficient);
         encoder_steerMotor.setVelocityConversionFactor(Constants.steerVelocityCoefficient);
@@ -67,7 +60,7 @@ public class SwerveModule {
         cancoder_steerMotor = new CANCoder(id_steerCanCoder);
         cancoder_steerMotor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
         cancoder_steerMotor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-        cancoder_steerMotor.configMagnetOffset(360 - steerOffset.getDegrees());
+        cancoder_steerMotor.configMagnetOffset(/*360 - steerOffset.getDegrees()*/0);
 
         outputTelemetry(); 
         setAngleCanCoderToPositionMotor();
@@ -161,7 +154,7 @@ public class SwerveModule {
     }
 
     public void outputTelemetry (){
-        ShuffleboardLayout motorsData = tabDrivePositions.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList);
+        ShuffleboardLayout motorsData = tabDrivePositions.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 2);
         motorsData.addDouble("SpeedMotorPosition", () -> {return getPositionSpeedMotor();});
         motorsData.addDouble("SpeedMotorVelocity", () -> {return getVelocitySpeedMotor();});
         motorsData.addDouble("CanCoderAngle", () -> {return getCanCoderAngle().getDegrees();});
