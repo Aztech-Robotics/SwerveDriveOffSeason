@@ -41,7 +41,8 @@ public class SwerveModule {
         controller_speedMotor.setIZone(Constants.kIz_speedController, 0);
 
         steerMotor = new CANSparkMax(id_steerMotor, MotorType.kBrushless);
-        steerMotor.setSmartCurrentLimit(0, 50, 0);
+        steerMotor.setSmartCurrentLimit(50);
+        speedMotor.setSmartCurrentLimit(50);
         encoder_steerMotor = steerMotor.getEncoder();
         encoder_steerMotor.setPositionConversionFactor(Constants.steerPositionCoefficient);
         encoder_steerMotor.setVelocityConversionFactor(Constants.steerVelocityCoefficient);
@@ -60,9 +61,10 @@ public class SwerveModule {
         cancoder_steerMotor = new CANCoder(id_steerCanCoder);
         cancoder_steerMotor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
         cancoder_steerMotor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-        cancoder_steerMotor.configMagnetOffset(/*360 - steerOffset.getDegrees()*/0);
+        cancoder_steerMotor.configMagnetOffset(360 - steerOffset.getDegrees());
 
         outputTelemetry(); 
+        encoder_steerMotor.setPosition(getCanCoderAngle().getRadians());
         setAngleCanCoderToPositionMotor();
         encoder_speedMotor.setPosition(0);
     }
@@ -72,11 +74,11 @@ public class SwerveModule {
     }
     
     public void velocitySpeedMotor (double velocity){
-        controller_speedMotor.setReference(velocity/Constants.driveVelocityCoefficient, CANSparkMax.ControlType.kVelocity); 
+        controller_speedMotor.setReference(velocity, CANSparkMax.ControlType.kVelocity); 
     }
     
     public double getVelocitySpeedMotor (){
-        return (encoder_speedMotor.getVelocity()*Constants.driveVelocityCoefficient);
+        return (encoder_speedMotor.getVelocity() * Constants.driveVelocityCoefficient);
     }
     
     public void setPositionSpeedMotor (double position){
@@ -85,10 +87,6 @@ public class SwerveModule {
     
     public double getPositionSpeedMotor (){
         return encoder_speedMotor.getPosition();
-    }
-    
-    public void voltageSteerMotor (double output){
-        controller_steerMotor.setReference(output, CANSparkMax.ControlType.kDutyCycle);
     }
 
     public Rotation2d getCanCoderAngle (){
@@ -131,7 +129,7 @@ public class SwerveModule {
     }
     
     public void setModuleState (SwerveModuleState moduleState){
-        velocitySpeedMotor(moduleState.speedMetersPerSecond);
+        voltageSpeedMotor(moduleState.speedMetersPerSecond/Constants.maxDriveVel);
         angleSteerMotor(moduleState.angle);
     }
     
@@ -154,7 +152,7 @@ public class SwerveModule {
     }
 
     public void outputTelemetry (){
-        ShuffleboardLayout motorsData = tabDrivePositions.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 2);
+        ShuffleboardLayout motorsData = tabDrivePositions.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 3);
         motorsData.addDouble("SpeedMotorPosition", () -> {return getPositionSpeedMotor();});
         motorsData.addDouble("SpeedMotorVelocity", () -> {return getVelocitySpeedMotor();});
         motorsData.addDouble("CanCoderAngle", () -> {return getCanCoderAngle().getDegrees();});

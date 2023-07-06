@@ -11,11 +11,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveMode;
@@ -23,13 +22,13 @@ import frc.robot.Constants.SwerveMode;
 public class SwerveDrive extends SubsystemBase {
   public static SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(
     //FrontLeft
-    new Translation2d(-Constants.trackWidth/2, Constants.wheelBase/2),
-    //FrontRight
     new Translation2d(Constants.trackWidth/2, Constants.wheelBase/2),
+    //FrontRight
+    new Translation2d(Constants.trackWidth/2, -Constants.wheelBase/2),
     //RearLeft
-    new Translation2d(-Constants.trackWidth/2, -Constants.wheelBase/2),
+    new Translation2d(-Constants.trackWidth/2, Constants.wheelBase/2),
     //RearRight 
-    new Translation2d(Constants.trackWidth/2, -Constants.wheelBase/2)
+    new Translation2d(-Constants.trackWidth/2, -Constants.wheelBase/2)
   );
   private SwerveModule[] modules = new SwerveModule[4];
   private ChassisSpeeds desiredChassisSpeeds = null;
@@ -45,7 +44,7 @@ public class SwerveDrive extends SubsystemBase {
     modules[2] = new SwerveModule(Constants.id_drive_bLeft, Constants.id_steer_bLeft, Constants.id_canCoder_bLeft, Constants.offset_bLeft);
     modules[3] = new SwerveModule(Constants.id_drive_bRight, Constants.id_steer_bRight, Constants.id_canCoder_bRight, Constants.offset_bRight);
     setCoastMode();
-    resetChassisPosition(); 
+    outputTelemetry();
   }
 
   @Override
@@ -59,7 +58,7 @@ public class SwerveDrive extends SubsystemBase {
         if (desiredChassisSpeeds != null) {
           moduleStatesArray = swerveDriveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
           SwerveDriveKinematics.desaturateWheelSpeeds(moduleStatesArray, Constants.maxDriveVel);
-          setModulesStates(moduleStatesArray);
+          setModulesStatesWithVelocity(moduleStatesArray);
         }
         desiredChassisSpeeds = null;
       break;
@@ -97,7 +96,13 @@ public class SwerveDrive extends SubsystemBase {
     return swerveModulesStates;
   }
   
-  public void setModulesStates (SwerveModuleState[] swerveModulesModuleStates){
+  public void setModulesStatesWithVelocity (SwerveModuleState[] swerveModulesModuleStates){
+    for (int i=0; i < modules.length; i++){
+      modules[i].setModuleState(SwerveModuleState.optimize(swerveModulesModuleStates[i], modules[i].getCanCoderAngle()));
+    }
+  }
+
+  public void setModulesStatesWithVoltage (SwerveModuleState[] swerveModulesModuleStates){
     for (int i=0; i < modules.length; i++){
       modules[i].setModuleState(SwerveModuleState.optimize(swerveModulesModuleStates[i], modules[i].getCanCoderAngle()));
     }
@@ -130,10 +135,6 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void resetChassisPosition (){
-    for (SwerveModule module : modules){
-      module.setAngleCanCoderToPositionMotor();
-      module.setModulePosition(new SwerveModulePosition(0, Rotation2d.fromDegrees(0)));
-    }
     resetGyroAngle();
     swerveDriveOdometry = new SwerveDriveOdometry(swerveDriveKinematics, getGyroAngle(), getModulesPosition());
   }
@@ -143,7 +144,22 @@ public class SwerveDrive extends SubsystemBase {
   }
   
   public Rotation2d getGyroAngle (){
-    return gyro.getRotation2d();
+    double angle = Math.IEEEremainder(-gyro.getAngle(), 360);
+    Rotation2d gyroRotation = Rotation2d.fromDegrees(angle);
+    return gyroRotation;
+  }
+
+  public Rotation2d getGyroAngle2 (){
+    Rotation2d gyroRotation = gyro.getRotation2d();
+    double mod = gyroRotation.getDegrees() % 360;
+    if (mod != 0){
+      if (mod > 0){
+        gyroRotation = Rotation2d.fromDegrees(Math.abs(mod));
+      } else {
+        gyroRotation = Rotation2d.fromDegrees(Math.abs(360 - mod));
+      }
+    }
+    return gyroRotation;
   }
   
   public void updateOdometry (){
@@ -157,7 +173,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void outputTelemetry (){
-    tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}).withWidget(BuiltInWidgets.kGyro); 
+    tabDrive.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}); 
   }
   
   @Override

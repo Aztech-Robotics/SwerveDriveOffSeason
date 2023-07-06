@@ -26,26 +26,26 @@ public final class Constants {
   public static final int id_drive_fLeft = 1;
   public static final int id_steer_fLeft = 2;
   public static final int id_canCoder_fLeft = 3;
-  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(100);
+  public static final Rotation2d offset_fLeft = Rotation2d.fromDegrees(61);
 
   public static final int id_drive_fRight = 4;
   public static final int id_steer_fRight = 5;
   public static final int id_canCoder_fRight = 6;
-  public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(0);
+  public static final Rotation2d offset_fRight = Rotation2d.fromDegrees(5);
 
   public static final int id_drive_bLeft = 7;
   public static final int id_steer_bLeft = 8;
   public static final int id_canCoder_bLeft = 9;
-  public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(132);
+  public static final Rotation2d offset_bLeft = Rotation2d.fromDegrees(51);
 
   public static final int id_drive_bRight = 10;
   public static final int id_steer_bRight = 11;
   public static final int id_canCoder_bRight = 12;
-  public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(35); 
+  public static final Rotation2d offset_bRight = Rotation2d.fromDegrees(274); 
 
   public static final double kp_steerController = 0.8;
   public static final double ki_steerController = 0.0;
-  public static final double kd_steerController = 0.0;
+  public static final double kd_steerController = 1;
   public static final double kf_steerController = 0.0;
   public static final double kIz_steerController = 0.0;
 

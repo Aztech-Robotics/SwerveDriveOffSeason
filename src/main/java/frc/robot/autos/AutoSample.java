@@ -10,8 +10,9 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.AutoBase;
 
-public class FullAuto implements AutoBase {
-    public FullAuto (){
+public class AutoSample implements AutoBase {
+    private PathPlannerTrajectory trajectory = PathPlanner.loadPath("Calibration", new PathConstraints(3, 2));
+    public AutoSample (){
     }
 
     @Override public HashMap<String, Command> getEventMap (){
@@ -19,6 +20,6 @@ public class FullAuto implements AutoBase {
     }
 
     @Override public PathPlannerTrajectory getTrajectory (){
-        return null;
+        return trajectory;
     }
 }

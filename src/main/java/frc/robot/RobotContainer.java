@@ -2,26 +2,35 @@
 package frc.robot;
 
 import frc.robot.actions.FieldOrientedDrive;
+import frc.robot.autos.AutoSample;
 import frc.robot.subsystems.SwerveDrive;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
   private CommandXboxController Control0 = new CommandXboxController(0);
-  private CommandXboxController Control1 = new CommandXboxController(1);
   private final SwerveDrive m_SwerveDrive = new SwerveDrive();
   private final FieldOrientedDrive m_FieldOrientedDrive = new FieldOrientedDrive(
     m_SwerveDrive, 
-    () -> {return -Control0.getLeftY();}, 
+    () -> {return Control0.getLeftY();}, 
     () -> {return Control0.getLeftX();}, 
     () -> {return Control0.getRightX();}
   );
+  private AutonomousBuilder autonomousBuilder = new AutonomousBuilder(m_SwerveDrive);
+  private AutoSample autoSample = new AutoSample();
+  private SendableChooser<Command> m_chooser_auto = new SendableChooser<>();
 
   public RobotContainer() {
     m_SwerveDrive.setDefaultCommand(m_FieldOrientedDrive);
+    m_chooser_auto.setDefaultOption("NoAuto", null);
+    m_chooser_auto.addOption("AutoSample", autonomousBuilder.createCommand(autoSample));
+    Shuffleboard.getTab("DriveData").add("AutoSelected", m_chooser_auto);
     configureBindings();
   }
 
@@ -50,6 +59,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return null; 
+    return m_chooser_auto.getSelected();
   }
 }
