@@ -21,8 +21,12 @@ public class Limelight {
     return getTagID() != -1? true : false; 
   }
 
-  public Pose2d getBotPose (){
+  public Pose2d getBotPoseBlueAlliance (){
     return LimelightHelpers.getBotPose2d_wpiBlue(null);
+  }
+
+  public Pose2d getBotPoseRedAlliance (){
+    return LimelightHelpers.getBotPose2d_wpiRed(null);
   }
 
   public double getX (){

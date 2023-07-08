@@ -11,7 +11,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -161,8 +163,17 @@ public class SwerveDrive extends SubsystemBase {
   
   public void updateOdometry (){
     if (limelight.sawTag()){
-      swerveDrivePoseEstimator.addVisionMeasurement(limelight.getBotPose(), 
-      Timer.getFPGATimestamp() - (limelight.getLatencyPipeline()/1000.0) - (limelight.getLatencyCapture()/1000.0));
+      Alliance alliance = DriverStation.getAlliance();
+      switch (alliance){
+        case Blue:
+          swerveDrivePoseEstimator.addVisionMeasurement(limelight.getBotPoseBlueAlliance(), Timer.getFPGATimestamp() - (limelight.getLatencyPipeline()/1000.0) - (limelight.getLatencyCapture()/1000.0));
+        break;
+        case Red:
+          swerveDrivePoseEstimator.addVisionMeasurement(limelight.getBotPoseRedAlliance(), Timer.getFPGATimestamp() - (limelight.getLatencyPipeline()/1000.0) - (limelight.getLatencyCapture()/1000.0));
+        break;
+        case Invalid:
+        break;
+      }
     } else {
       swerveDrivePoseEstimator.update(getGyroAngle(), getModulesPosition());
     }
@@ -179,9 +190,5 @@ public class SwerveDrive extends SubsystemBase {
     tabSwerve.addDouble("Y Pose Odometry", ()->{return getCurrentPose().getY();}).withPosition(9, 0);
     tabSwerve.addDouble("GyroAngle", ()->{return getGyroAngle().getDegrees();}).withPosition(8, 1); 
     tabSwerve.addDouble("TAG ID", ()->{return limelight.getTagID();}).withPosition(9, 1);
-  }
-  
-  @Override
-  public void simulationPeriodic() {
   }
 }
