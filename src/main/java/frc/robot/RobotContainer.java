@@ -30,7 +30,7 @@ public class RobotContainer {
     m_SwerveDrive.setDefaultCommand(m_FieldOrientedDrive);
     m_chooser_auto.setDefaultOption("NoAuto", null);
     m_chooser_auto.addOption("AutoSample", autonomousBuilder.createCommand(autoSample));
-    Shuffleboard.getTab("DriveData").add("AutoSelected", m_chooser_auto);
+    Shuffleboard.getTab("SwerveData").add("AutoSelected", m_chooser_auto).withSize(2, 1).withPosition(8, 2);
     configureBindings();
   }
 

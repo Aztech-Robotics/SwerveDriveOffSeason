@@ -50,7 +50,7 @@ public final class Constants {
   public static final double kIz_steerController = 0.0;
 
   public static final double kp_speedController = 0.0004;
-  public static final double ki_speedController = 0.0;
+  public static final double ki_speedController = 0.00002;
   public static final double kd_speedController = 0.0;
   public static final double kf_speedController = 0.0;
   public static final double kIz_speedController = 0.0;

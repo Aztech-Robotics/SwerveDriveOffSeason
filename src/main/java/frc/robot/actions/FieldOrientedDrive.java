@@ -25,7 +25,7 @@ public class FieldOrientedDrive extends CommandBase {
 
   @Override
   public void initialize() {
-    m_SwerveDrive.setMode(SwerveMode.OpenLoopWithVelocity);
+    m_SwerveDrive.setMode(SwerveMode.OpenLoopWithVoltage);
   }
 
   @Override

@@ -26,7 +26,9 @@ public class SwerveModule {
     private RelativeEncoder encoder_steerMotor;
     private SparkMaxPIDController controller_steerMotor;
     private CANCoder cancoder_steerMotor;
-    private ShuffleboardTab tabDrivePositions = Shuffleboard.getTab("MotorsData");
+    private ShuffleboardTab tabSwerve = Shuffleboard.getTab("SwerveData");
+    private SwerveModuleState desiredState = new SwerveModuleState();
+
 
     public SwerveModule (int id_speedMotor, int id_steerMotor, int id_steerCanCoder, Rotation2d steerOffset){
         speedMotor = new CANSparkMax(id_speedMotor, MotorType.kBrushless);
@@ -128,13 +130,24 @@ public class SwerveModule {
         return Rotation2d.fromRadians(angleRadians);
     }
     
-    public void setModuleState (SwerveModuleState moduleState){
-        voltageSpeedMotor(moduleState.speedMetersPerSecond/Constants.maxDriveVel);
+    public void setModuleStateWithVelocity (SwerveModuleState moduleState){
+        desiredState = moduleState;
+        velocitySpeedMotor(moduleState.speedMetersPerSecond);
+        angleSteerMotor(moduleState.angle);
+    }
+
+    public void setModuleStateWithVoltage (SwerveModuleState moduleState){
+        desiredState = moduleState;
+        voltageSpeedMotor(moduleState.speedMetersPerSecond / Constants.maxDriveVel);
         angleSteerMotor(moduleState.angle);
     }
     
     public SwerveModuleState getModuleState (){
         return new SwerveModuleState(getVelocitySpeedMotor(), getSteerMotorAngle());
+    }
+
+    public SwerveModuleState getDesiredModuleState (){
+        return desiredState;
     }
     
     public void setModulePosition (SwerveModulePosition swerveModulePosition){
@@ -152,10 +165,13 @@ public class SwerveModule {
     }
 
     public void outputTelemetry (){
-        ShuffleboardLayout motorsData = tabDrivePositions.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 3);
+        ShuffleboardLayout motorsData = tabSwerve.getLayout("Module " + speedMotor.getDeviceId() + "-" + steerMotor.getDeviceId(), BuiltInLayouts.kList).withSize(2, 3);
         motorsData.addDouble("SpeedMotorPosition", () -> {return getPositionSpeedMotor();});
         motorsData.addDouble("SpeedMotorVelocity", () -> {return getVelocitySpeedMotor();});
         motorsData.addDouble("CanCoderAngle", () -> {return getCanCoderAngle().getDegrees();});
         motorsData.addDouble("SteerMotorAngle", () -> {return getSteerMotorAngle().getDegrees();});
+        motorsData.addDouble("DS Velocity", ()->{return getDesiredModuleState().speedMetersPerSecond;});
+        motorsData.addDouble("DS Angle", ()->{return getDesiredModuleState().angle.getDegrees();});
+
     }
 }

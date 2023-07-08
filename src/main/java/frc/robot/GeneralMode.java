@@ -5,7 +5,7 @@ import frc.robot.Constants.GeneralModeEnum;
 
 public class GeneralMode {
     private static GeneralMode generalMode = null;
-    private GeneralModeEnum activeMode;
+    private static GeneralModeEnum activeMode;
     private boolean notifier = false;
 
     private GeneralMode (){}
@@ -13,7 +13,7 @@ public class GeneralMode {
     public static GeneralMode getInstance (){
         if (generalMode == null){
             generalMode = new GeneralMode();
-            generalMode.setMode(GeneralModeEnum.Cone);
+            activeMode = GeneralModeEnum.Cone;
         }
         return generalMode;
     }

@@ -1,38 +1,54 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.GeneralMode;
+import frc.robot.LimelightHelpers;
 import frc.robot.Constants.TypePipeline;
 
-public class Limelight extends SubsystemBase {
+public class Limelight {
   private TypePipeline activePipeline;
 
   public Limelight() {
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(0);
     setPipelineByGeneralMode();
   }
 
-  @Override
-  public void periodic() {
+  public double getTagID (){
+    return LimelightHelpers.getFiducialID(null);
   }
 
-  public double getTargetXOffset (){
-    return 0;
+  public boolean sawTag (){
+    return getTagID() != -1? true : false; 
   }
 
-  public double getTargetYOffset (){
-    return 0;
+  public Pose2d getBotPose (){
+    return LimelightHelpers.getBotPose2d_wpiBlue(null);
+  }
+
+  public double getX (){
+    return LimelightHelpers.getTX(null);
+  }
+
+  public double getY (){
+    return LimelightHelpers.getTY(null);
+  }
+
+  public double getLatencyPipeline (){
+    return LimelightHelpers.getLatency_Pipeline(null);
+  }
+
+  public double getLatencyCapture (){
+    return LimelightHelpers.getLatency_Capture(null);
   }
 
   public void setPipeline(TypePipeline pipeline){
     activePipeline = pipeline;
     switch (pipeline){
       case RetroflectiveTape:
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
+      LimelightHelpers.setPipelineIndex(null, 0);
       break;
       case AprilTag:
-      NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+      LimelightHelpers.setPipelineIndex(null, 1);
       break;
     }
   }
