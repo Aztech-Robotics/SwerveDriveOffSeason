@@ -21,16 +21,18 @@ public class AutonomousBuilder {
             m_swerveDrive::getCurrentPose, 
             m_swerveDrive::setCurrentPose, 
             SwerveDrive.swerveDriveKinematics, 
-            new PIDConstants(7, 0, 0.005), 
-            new PIDConstants(0, 0.001, 0), 
+            new PIDConstants(5, 0, 0), 
+            new PIDConstants(0, 0, 0), 
             m_swerveDrive::setModulesStatesWithVoltage, 
             m_autoBase.getEventMap(), 
             true, 
             m_swerveDrive
         );
-        m_swerveDrive.resetChassisPosition(m_autoBase.getTrajectory().getInitialHolonomicPose());
-        m_swerveDrive.setCurrentPose(m_autoBase.getTrajectory().getInitialHolonomicPose());
-        m_swerveDrive.setMode(SwerveMode.Trajectory);
+        if (autoBase.isFirstPath()){
+            m_swerveDrive.resetChassisPosition(autoBase.getTrajectory().getInitialPose());
+            m_swerveDrive.setCurrentPose(autoBase.getTrajectory().getInitialHolonomicPose());
+            m_swerveDrive.setMode(SwerveMode.Trajectory);
+        }
         return autoBuilder.followPathWithEvents(m_autoBase.getTrajectory()); 
     }
 }

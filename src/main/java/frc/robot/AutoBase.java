@@ -7,4 +7,5 @@ import edu.wpi.first.wpilibj2.command.Command;
 public interface AutoBase {
     public HashMap<String, Command> getEventMap ();
     public PathPlannerTrajectory getTrajectory (); 
+    public boolean isFirstPath ();
 }

@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,6 +49,12 @@ public class SwerveDrive extends SubsystemBase {
     modules[3] = new SwerveModule(Constants.id_drive_bRight, Constants.id_steer_bRight, Constants.id_canCoder_bRight, Constants.offset_bRight);
     setCoastMode();
     outputTelemetry();
+    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, 
+    getGyroAngle(), 
+    getModulesPosition(), 
+    new Pose2d(), 
+    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
+    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0));
   }
 
   @Override
@@ -147,7 +155,12 @@ public class SwerveDrive extends SubsystemBase {
     for (SwerveModule module : modules){
       module.setPositionSpeedMotor(0);
     }
-    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, getGyroAngle(), getModulesPosition(), initialPose);
+    swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(swerveDriveKinematics, 
+    getGyroAngle(), 
+    getModulesPosition(), 
+    initialPose, 
+    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0), 
+    new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0, 0, 0));
   }
   
   public void resetGyroAngle (){
